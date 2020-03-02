@@ -1,0 +1,27 @@
+//
+// Created by marker on 02.03.2020.
+//
+
+#ifndef LB2_STRING_H
+#define LB2_STRING_H
+
+#include <string>
+#include <vector>
+
+class String : public std::string {
+public:
+    std::vector<String> split_to_vector(std::string str);
+
+    std::string *split(std::string str);
+
+    String strip();
+
+    String format();
+
+    String(const char *string) : std::string(string) {};
+
+    String() : std::string("") {};
+};
+
+
+#endif //LB2_STRING_H
