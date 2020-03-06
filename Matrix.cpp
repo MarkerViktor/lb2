@@ -2,7 +2,7 @@
 #include <iostream>
 
 /* Матрица из TXT файла file_path под номером number */
-Matrix::Matrix(std::string file_path, int number = 0) {
+Matrix::Matrix(std::string file_path, int number) {
     std::ifstream file(file_path);
     if (!file.is_open())
         throw std::runtime_error("Path error!");
@@ -65,39 +65,30 @@ Matrix Matrix::operator!() {
 }
 
 /* Определитель */
-double determinant_func(std::vector<std::vector<double>> matrix) {
-    double determinant = 0;
-    int sign = 0;
-    if (matrix.size() == 3)
-        return matrix[0][0] * matrix[1][1] * matrix[2][2] + matrix[0][1] * matrix[1][2] * matrix[2][0] + matrix[0][2] * matrix[1][0] * matrix[2][1] - matrix[0][2] * matrix[1][1] * matrix[2][0] - matrix[0][1] * matrix[1][0] * matrix[2][2] - matrix[0][0] * matrix[1][2] * matrix[2][1];
-    if (matrix.size() == 2)
-        return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
-    for (int q = 0; q < matrix.size(); q++) {
-        std::vector<std::vector<double>> new_matrix;
-        for (int w = 0; w < matrix.size(); w++) {
-            std::vector<double> line;
-            for (int e = 1; e < matrix.size(); e++)
-                line.push_back(matrix[w][e]);
-            if (w != q)
-                new_matrix.push_back(line);
-        }
-        if (sign++ % 2 == 0)
-            determinant += determinant_func(new_matrix) * matrix[q][0];
-        else
-            determinant -= determinant_func(new_matrix) * matrix[q][0];
-    }
-    return determinant;
+std::vector<double> subtract_line(std::vector<double> one, std::vector<double> two) {
+    for (int q = 0; q < one.size(); q++)
+        one[q] -= two[q];
+    return one;
+}
+std::vector<double> multiply_line(std::vector<double> one, double number) {
+    for (int q = 0; q < one.size(); q++)
+        one[q] *= number;
+    return one;
+}
+double Matrix::determinate() {
+    for (int q = 0; q < matrix.size(); q++)
+        for (int w = q + 1; w < matrix.size(); w++)
+            matrix[w] = subtract_line(matrix[w],multiply_line(matrix[q], matrix[w][q] / matrix[q][q]));
+    double det = 1;
+    for (int q = 0; q < matrix.size(); q++)
+        det *= matrix[q][q];
+    return det;
 }
 
-double determinant_func_2(std::vector<std::vector<double>> matrix){
-    
+/* Обратная матрица */
+Matrix Matrix::inverse() {
+
 }
-
-double Matrix::determinant(){
-    return determinant_func(this->matrix);
-}
-
-
 
 /* Операторы умножения */
 Matrix operator*(Matrix matrix, const double number){

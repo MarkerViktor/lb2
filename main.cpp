@@ -6,7 +6,7 @@ using namespace std;
 
 int main() {
     setlocale(LC_ALL, "ru");
-    Matrix matrix("D:\\lb2\\Task.txt", 6);
-    cout << matrix.determinant() << endl;
+    Matrix matrix("/Users/mihailnefedov/CLionProjects/lb2/Task.txt", 6);
+    cout << matrix.determinate() << endl;
 }
 

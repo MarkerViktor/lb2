@@ -14,7 +14,7 @@ private:
     std::pair<int, int> _size; // first – количество строк, second – количество столбцов
     std::vector<std::vector<double>> matrix;  // Матрица
 public:
-    Matrix(std::string file_path, int number);
+    Matrix(std::string file_path, int number = 0);
 
     Matrix(std::vector<std::vector<double>> vector);
 
@@ -25,7 +25,9 @@ public:
     Matrix getTransposed(); // Возвраащет транспонированную матрицу, не меняя оригинал
     Matrix operator!();
 
-    double determinant();
+    double determinate();
+
+    Matrix inverse();
 
     friend Matrix operator*(Matrix matrix, double number);
 
