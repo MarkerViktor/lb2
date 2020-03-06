@@ -7,6 +7,6 @@ using namespace std;
 int main() {
     setlocale(LC_ALL, "ru");
     Matrix matrix("D:\\lb2\\Task.txt", 6);
-    cout << matrix.getTransposed().getRaw() << endl;
+    cout << matrix.determinant() << endl;
 }
 

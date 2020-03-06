@@ -26,9 +26,16 @@ std::string *String::split(std::string str) {
 };
 
 String String::strip() {
-    while (this->at(0) == ' ' || this->at(0) == '\t')
+    char first = this->at(0);
+    char last = this->at(this->size() - 1);
+    while (first == ' ' or first == '\t' or first == '\n'){
         this->erase(0, 1);
-    while (this->at(this->size() - 1) == ' ' || this->at(0) == '\t')
+        first = this->at(0);
+    }
+
+    while (last == ' ' or last == '\t' or last == '\n') {
         this->erase(this->size() - 1);
+        last = this->at(this->size() - 1);
+    }
     return *this;
 }

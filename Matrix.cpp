@@ -1,8 +1,7 @@
 #include "Matrix.h"
 #include <iostream>
 
-        /* Конструкторы */
-// Матрица из TXT файла file_path под номером number
+/* Матрица из TXT файла file_path под номером number */
 Matrix::Matrix(std::string file_path, int number = 0) {
     std::ifstream file(file_path);
     if (!file.is_open())
@@ -20,7 +19,7 @@ Matrix::Matrix(std::string file_path, int number = 0) {
 
     /* разделение на строки с отдельными числами (через 4 пробела)*/
     std::vector<std::vector<double>> matrix;
-    std::vector<String> lines = variants[number - 1].split_to_vector("\n");
+    std::vector<String> lines = variants[number].split_to_vector("\n");
     for (String line: lines) {
         std::vector<double> numbers;
         std::vector<String> numbers_string = line.split_to_vector("    ");
@@ -30,13 +29,11 @@ Matrix::Matrix(std::string file_path, int number = 0) {
     }
     this->setMatrix(matrix);
 }
-
-// матрица из двумерного вектора
+/* Матрица из двумерного вектора */
 Matrix::Matrix(std::vector<std::vector<double>> vector) {
     this->setMatrix(vector);
 }
-
-// матрица заданного размера (lines и columns) заполненная значением value
+/* Матрица заданного размера (lines и columns) заполненная значением value */
 Matrix::Matrix(int lines, int columns, double value) {
     std::vector<std::vector<double>> vector;
     for (int q = 0; q < lines; q++) {
@@ -48,13 +45,11 @@ Matrix::Matrix(int lines, int columns, double value) {
     this->setMatrix(vector);
 }
 
-        /* Транспонирование */
-// транспонирует вызвавший объект
+/* Транспонирует объект */
 void Matrix::transpose() {
     this->setMatrix(this->getTransposed().getMatrix());
 }
-
-// возвращает объект транспонированной матрицы (вызвавший объект не изменяется)
+/* Возвраащет транспонированную матрицу, не меняя оригинал */
 Matrix Matrix::getTransposed() {
     std::vector<std::vector<double>> new_matrix;
     for (int q = 0; q < this->_size.second; q++) {
@@ -65,20 +60,77 @@ Matrix Matrix::getTransposed() {
     }
     return Matrix(new_matrix);
 }
-
-        /* Ввод|Вывод */
-// Возвращает строку, содержащую матрицу построчно
-String Matrix::getRaw(std::string str = "  ") {
-    String raw;
-    for (std::vector<double> line: this->getMatrix()) {
-        for (double number: line)
-            raw += std::to_string(number) + str;
-        raw += "\n";
-    }
-    return raw;
+Matrix Matrix::operator!() {
+    return this->getTransposed();
 }
 
-// Возваращет пару из кол-ва строк и столбцов
+/* Определитель */
+double determinant_func(std::vector<std::vector<double>> matrix) {
+    double determinant = 0;
+    int sign = 0;
+    if (matrix.size() == 3)
+        return matrix[0][0] * matrix[1][1] * matrix[2][2] + matrix[0][1] * matrix[1][2] * matrix[2][0] + matrix[0][2] * matrix[1][0] * matrix[2][1] - matrix[0][2] * matrix[1][1] * matrix[2][0] - matrix[0][1] * matrix[1][0] * matrix[2][2] - matrix[0][0] * matrix[1][2] * matrix[2][1];
+    if (matrix.size() == 2)
+        return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+    for (int q = 0; q < matrix.size(); q++) {
+        std::vector<std::vector<double>> new_matrix;
+        for (int w = 0; w < matrix.size(); w++) {
+            std::vector<double> line;
+            for (int e = 1; e < matrix.size(); e++)
+                line.push_back(matrix[w][e]);
+            if (w != q)
+                new_matrix.push_back(line);
+        }
+        if (sign++ % 2 == 0)
+            determinant += determinant_func(new_matrix) * matrix[q][0];
+        else
+            determinant -= determinant_func(new_matrix) * matrix[q][0];
+    }
+    return determinant;
+}
+
+double determinant_func_2(std::vector<std::vector<double>> matrix){
+    
+}
+
+double Matrix::determinant(){
+    return determinant_func(this->matrix);
+}
+
+
+
+/* Операторы умножения */
+Matrix operator*(Matrix matrix, const double number){
+    for (int q = 0; q < matrix.size().first; q++)
+        for (int w = 0; w < matrix.size().second; w++)
+            matrix[q][w] *= number;
+    return matrix;
+}
+Matrix operator*(const double number, Matrix matrix){
+    return operator*(matrix, number);
+}
+
+/* Возвращает строку, содержащую матрицу построчно */
+std::string Matrix::toRaw(std::string str) {
+    std::string raw;
+    for (std::vector<double> line: this->getMatrix()) {
+        for (double number: line)
+            raw += str + std::to_string(number);
+        raw += "\n";
+    }
+    raw += "\n";
+    return raw;
+}
+/* Сохраняет матрицу в конец файл file_path */
+void Matrix::save(std::string file_path, std::string str) {
+    std::ofstream file(file_path, std::ios_base::app);
+    if (!file.is_open())
+        throw std::runtime_error("Path error!");
+    file << this->toRaw();
+}
+
+
+/* Возваращет пару из кол-ва строк и столбцов */
 std::pair<int, int> Matrix::size() {
     return _size;
 }

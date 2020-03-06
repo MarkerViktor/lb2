@@ -21,12 +21,20 @@ public:
     Matrix(int lines, int columns, double value);
 
 public:
-    void transpose();
+    void transpose(); // Транспонирует объект
+    Matrix getTransposed(); // Возвраащет транспонированную матрицу, не меняя оригинал
+    Matrix operator!();
 
-    Matrix getTransposed();
+    double determinant();
+
+    friend Matrix operator*(Matrix matrix, double number);
+
+    friend Matrix operator*(double number, Matrix matrix);
 
 public:
-    String getRaw(std::string str);
+    std::string toRaw(std::string str = "    "); // Возвращает строку с матрицей построчно
+
+    void save(std::string file_path, std::string str = "   ");
 
     std::pair<int, int> size();
 
