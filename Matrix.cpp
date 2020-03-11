@@ -2,36 +2,9 @@
 #include <iostream>
 #include <cmath>
 
-/* РњР°С‚СЂРёС†Р° РёР· TXT С„Р°Р№Р»Р° file_path РїРѕРґ РЅРѕРјРµСЂРѕРј number, СЂР°Р·РґРµР»РµРЅРЅР°СЏ СЃС‚СЂРѕРєРѕР№ str*/
+/* Матрица из TXT файла file_path под номером number, разделенная строкой str*/
 Matrix::Matrix(std::string file_path, int number, std::string str) {
-    std::ifstream file(file_path);
-    if (!file.is_open())
-        throw std::runtime_error("Path error!");
-
-    /* СЃС‡РёС‚С‹РІР°РЅРёРµ РІСЃРµРіРѕ С„Р°Р№Р»Р° РІ СЃС‚СЂРѕРєСѓ */
-    String string;
-    while (!file.eof())
-        string += file.get();
-
-    /* СЂР°Р·РґРµР»РµРЅРёРµ РЅР° РѕС‚РґРµР»СЊРЅС‹Рµ РјР°С‚СЂРёС†С‹ (С‡РµСЂРµР· РїСѓСЃС‚СѓСЋ СЃС‚СЂРѕРєСѓ) */
-    std::vector<String> variants = string.strip().split_to_vector("\n\n");
-    if (number > variants.size()-1)
-        throw std::runtime_error("Matrix number error!");
-
-    /* СЂР°Р·РґРµР»РµРЅРёРµ РЅР° СЃС‚СЂРѕРєРё СЃ РѕС‚РґРµР»СЊРЅС‹РјРё С‡РёСЃР»Р°РјРё (С‡РµСЂРµР· 4 РїСЂРѕР±РµР»Р°)*/
-    std::vector<std::vector<double>> matrix;
-    std::vector<String> lines = variants[number].strip().split_to_vector("\n");
-    if (lines.size() < 2)
-        throw std::runtime_error("Matrix error!");
-
-    for (String line: lines) {
-        std::vector<double> numbers;
-        std::vector<String> numbers_string = line.strip().split_to_vector(str);
-        for (String number: numbers_string)
-            numbers.push_back(std::strtod(number.data(), NULL));
-        matrix.push_back(numbers);
-    }
-    this->setMatrix(matrix);
+    fromFile(file_path, number, str);
 }
 Matrix::Matrix(std::vector<std::vector<double>> vector) {
     this->setMatrix(vector);
@@ -44,12 +17,41 @@ Matrix::Matrix(int lines, int columns) {
     }
     this->setMatrix(vector);
 }
+Matrix::Matrix(){};
 
-/* РўСЂР°РЅСЃРїРѕРЅРёСЂСѓРµС‚ РѕР±СЉРµРєС‚ */
-void Matrix::transpose() {
-    this->setMatrix(this->getTransposed().getMatrix());
-}\
-Matrix Matrix::getTransposed() {
+void Matrix::fromFile(std::string file_path, int number, std::string str) {
+    std::ifstream file(file_path);
+    if (!file.is_open())
+        throw std::runtime_error("path error");
+
+    /* считывание всего файла в строку */
+    String string;
+    while (!file.eof())
+        string += file.get();
+
+    /* разделение на отдельные матрицы (через пустую строку) */
+    std::vector<String> variants = string.strip().split("\n\n");
+    if (number > variants.size()-1)
+        throw std::runtime_error("matrix number error");
+
+    /* разделение на строки с отдельными числами (через 4 пробела)*/
+    std::vector<std::vector<double>> matrix;
+    std::vector<String> lines = variants[number].strip().split("\n");
+    if (lines.size() < 2)
+        throw std::runtime_error("matrix error");
+
+    for (String line: lines) {
+        std::vector<double> numbers;
+        std::vector<String> numbers_string = line.strip().split(str);
+        for (String number: numbers_string)
+            numbers.push_back(std::strtod(number.data(), NULL));
+        matrix.push_back(numbers);
+    }
+    this->setMatrix(matrix);
+}
+
+/* Транспонирует объект */
+Matrix Matrix::transpose() {
     std::vector<std::vector<double>> new_matrix;
     for (int q = 0; q < this->_size.second; q++) {
         std::vector<double> line;
@@ -59,11 +61,8 @@ Matrix Matrix::getTransposed() {
     }
     return Matrix(new_matrix);
 }
-Matrix Matrix::operator!() {
-    return this->getTransposed();
-}
 
-/* РћРїСЂРµРґРµР»РёС‚РµР»СЊ */
+/* Определитель */
 std::vector<double> subtract_line(std::vector<double> vector_0, std::vector<double> vector_1) {
     for (int q = 0; q < vector_0.size(); q++)
         vector_0[q] -= vector_1[q];
@@ -102,7 +101,7 @@ double Matrix::determinant() {
     return get_determinant(matrix);
 }
 
-/* РћР±СЂР°С‚РЅР°СЏ РјР°С‚СЂРёС†Р° */
+/* Обратная матрица */
 std::vector<std::vector<double>> Matrix::get_minor(int a, int b) {
     std::vector<std::vector<double>> minor;
     for (int q = 0; q < matrix.size(); q++) {
@@ -118,19 +117,16 @@ std::vector<std::vector<double>> Matrix::get_minor(int a, int b) {
     }
     return minor;
 }
-void Matrix::inverse(){
-    setMatrix(getInverse().getMatrix());
-}
-Matrix Matrix::getInverse() {
+Matrix Matrix::inverse() {
     double determinant_ = get_determinant(matrix);
     Matrix complement(_size.first, _size.second);
     for (int q = 0; q < matrix.size(); q++)
         for (int w = 0; w < matrix.size(); w++)
             complement[q][w] = get_determinant(get_minor(q, w)) * pow(-1, q+w);
-    return complement.getTransposed() * (1/determinant_);
+    return complement.transpose() * (1 / determinant_);
 }
 
-/* РћРїРµСЂР°С‚РѕСЂС‹ СѓРјРЅРѕР¶РµРЅРёСЏ */
+/* Операторы умножения */
 Matrix operator*(Matrix matrix, const double number){
     for (int q = 0; q < matrix.size().first; q++)
         for (int w = 0; w < matrix.size().second; w++)
@@ -141,9 +137,9 @@ Matrix operator*(const double number, Matrix matrix){
     return operator*(matrix, number);
 }
 
-/* Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃС‚СЂРѕРєСѓ, СЃРѕРґРµСЂР¶Р°С‰СѓСЋ РјР°С‚СЂРёС†Сѓ РїРѕСЃС‚СЂРѕС‡РЅРѕ */
-std::string Matrix::toRaw(std::string str) {
-    std::string raw;
+/* Возвращает строку, содержащую матрицу построчно */
+String Matrix::toRaw(std::string str) {
+    String raw;
     for (std::vector<double> line: matrix) {
         for (int q = 0; q < line.size(); q++) {
         if (q != 0)
@@ -155,28 +151,26 @@ std::string Matrix::toRaw(std::string str) {
     raw += "\n";
     return raw;
 }
-/* РЎРѕС…СЂР°РЅСЏРµС‚ РјР°С‚СЂРёС†Сѓ РІ РєРѕРЅРµС† С„Р°Р№Р» file_path */
+/* Сохраняет матрицу в конец файл file_path */
 void Matrix::save(std::string file_path, std::string str) {
     std::ofstream file(file_path, std::ios_base::app);
     if (!file.is_open())
-        throw std::runtime_error("Path error!");
+        throw std::runtime_error("path error");
     file << this->toRaw(str);
+    file.close();
 }
 
 
-/* Р’РѕР·РІР°СЂР°С‰РµС‚ РїР°СЂСѓ РёР· РєРѕР»-РІР° СЃС‚СЂРѕРє Рё СЃС‚РѕР»Р±С†РѕРІ */
+/* Возваращет пару из кол-ва строк и столбцов */
 std::pair<int, int> Matrix::size() {
     return _size;
 }
-
 std::vector<double> &Matrix::operator[](int number) {
     return matrix[number];
 }
-
 std::vector<std::vector<double>> &Matrix::getMatrix() {
     return matrix;
 }
-
 void Matrix::setMatrix(const std::vector<std::vector<double>> &matrix) {
     _size.first = matrix.size();
     _size.second = matrix[0].size();

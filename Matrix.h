@@ -17,15 +17,13 @@ public:
     Matrix(std::string file_path, int number = 0, std::string str = "    ");
     Matrix(std::vector<std::vector<double>> vector);
     Matrix(int lines, int columns);
+    Matrix();
 
-    void transpose(); // Транспонирует объект
-    Matrix getTransposed(); // Возвраащет транспонированную матрицу, не меняя оригинал
-    Matrix operator!();
+    void fromFile(std::string file_path, int number, std::string str);
 
+    Matrix transpose(); // Возвраащет транспонированную матрицу, не меняя оригинал
     double determinant();
-
-    void inverse();
-    Matrix getInverse();
+    Matrix inverse();
 
     friend Matrix operator*(Matrix matrix, double number);
     friend Matrix operator*(double number, Matrix matrix);
@@ -34,7 +32,7 @@ private:
     std::vector<std::vector<double>> get_minor(int a, int b);
 
 public:
-    std::string toRaw(std::string str = "    "); // Возвращает строку с матрицей построчно
+    String toRaw(std::string str = "    "); // Возвращает строку с матрицей построчно
 
     void save(std::string file_path, std::string str = "    ");
 

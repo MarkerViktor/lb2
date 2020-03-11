@@ -10,9 +10,7 @@
 
 class String : public std::string {
 public:
-    std::vector<String> split_to_vector(std::string str);
-
-    std::string *split(std::string str);
+    std::vector<String> split(std::string str);
 
     String strip();
 
@@ -26,6 +24,4 @@ public:
 
     String() : std::string("") {};
 };
-
-
 #endif //LB2_STRING_H
