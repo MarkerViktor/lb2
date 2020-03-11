@@ -1,5 +1,4 @@
 #include <iostream>
-#include <windows.h>
 #include <map>
 #include "Matrix.h"
 #include "String.h"
@@ -21,13 +20,13 @@ Matrix& get_matrix(String name) {
 }
 
 String help() {
-    return "<----------------------HELP--------------------->\n"
-           " - print {matrix name}\n"
-           " - load {new matrix name} from {path}|{matrix number}\n"
-           " - save {matrix name} to {path}\n"
-           " - transpose {matrix name} to {new matrix name}\n"
-           " - inverse {matrix name} to {new matrix name}\n"
-           " - determinate {matrix name}";
+    return "<-------------------------HELP------------------------>\n"
+           "  PRINT {matrix name}|{separator symbol}\n"
+           "  LOAD {new matrix name} FROM {path}|{matrix number}\n"
+           "  SAVE {matrix name} TO {path}|{separator symbol}\n"
+           "  TRANSPOSE {matrix name} TO {new matrix name}\n"
+           "  INVERSE {matrix name} TO {new matrix name}\n"
+           "  DETERMINANT {matrix name}";
 }
 
 String print(vector<String> command_parts) {
@@ -127,7 +126,7 @@ int main() {
         cout << "\n\n>>>";
 
         getline(cin, input);
-        cout << "\n";
+        cout << "\n  ";
 
         vector<String> parts = input.strip().split(" ");
         String command = parts[0];
@@ -161,7 +160,7 @@ int main() {
         } catch (runtime_error exception) {
             String what = exception.what();
             if (what == "unknown matrix error")
-                output = "! Unknown matrix name\n";
+                output = "! Unknown matrix name";
 
             else if (what == "already exist error")
                 output = "! Matrix with this name already exist\n";
@@ -175,7 +174,7 @@ int main() {
             else if (what == "error")
                 output = "! Unknown error";
             else
-                output = "! Unknown command\n";
+                output = "! Unknown command";
 
         }
 
