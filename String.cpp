@@ -56,17 +56,6 @@ String String::format(int number) {
         return string;
 }
 
-String String::format(unsigned int number) {
-    String string = *this;
-    int position = string.find("{}");
-    if (position != -1) {
-        string.erase(position, 2);
-        string.insert(position, std::to_string(number));
-        return string;
-    } else
-        return string;
-}
-
 String String::format(String string_) {
     String string = *this;
     int position = string.find("{}");

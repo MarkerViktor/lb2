@@ -15,9 +15,7 @@ public:
     String strip();
 
     String format(int number);
-    String format(unsigned int number);
     String format(String string);
-    String format(const std::string string);
     String format(double number);
 
     String(const char *string) : std::string(string) {};

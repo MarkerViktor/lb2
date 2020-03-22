@@ -52,7 +52,7 @@ String help() {
            " - SAVE {matrix name} TO {path}|{separator number ^ }\n"
            " - TRANSPOSE {matrix name} TO {new matrix name}\n"
            " - INVERSE {matrix name} TO {new matrix name}\n"
-           " - MULTIPLY {matrix name} TO {new matrix name}\n"
+           " - MULTIPLY {matrix name} BY {number} TO {new matrix name}\n"
            " - DETERMINANT {matrix name}\n"
            " - CLEAN\n"
            " - EXIT\n";
@@ -78,7 +78,7 @@ String print(vector<String> command_parts) { // PRINT matrix|1
     }
 
     Matrix &matrix = get_matrix(matrix_name);
-    String raw = matrix.toRaw(separator);
+    String raw = matrix.toString(separator);
     int rows = matrix.size().first;
     int columns = matrix.size().second;
     return String("Matrix \"{}\" [{}, {}]\n\n{}").format(matrix_name).format(rows).format(columns).format(raw);
@@ -182,18 +182,18 @@ String determinant(vector<String> command_parts) { // DETERMINANT matrix
     return String("A determinant of matrix \"{}\" = {}").format(matrix_name).format(matrix.determinant());
 }
 
-String multiply(vector<String> command_parts) { //MULTIPLY matrix_a TO matrix_b
-    if (command_parts.size() != 2 and (command_parts[2] != "TO" or command_parts.size() != 4))
+String multiply(vector<String> command_parts) { //MULTIPLY matrix_a BY number TO matrix_b
+    if (!(command_parts[2] == "BY" and (command_parts.size() == 4 or (command_parts[4] == "TO" and command_parts.size() == 6))))
         throw runtime_error("parameters error");
     String matrix_name = command_parts[1];
     Matrix &matrix = get_matrix(matrix_name);
-    double number = strtod(command_parts[1].data(), NULL);
+    double number = strtod(command_parts[3].data(), NULL);
 
-    if (command_parts.size() == 2) {
+    if (command_parts.size() == 4) {
         matrix = matrix * number;
         return String("Matrix \"{}\" was multiplied by {}").format(matrix_name).format(number);
-    } else if(command_parts.size() == 4) {
-        String matrix_to_name = command_parts[3];
+    } else  {
+        String matrix_to_name = command_parts[5];
         add_matrix(matrix_to_name, matrix * number);
         return String("New matrix \"{}\" is multiplied by {} matrix \"{}\"").format(matrix_to_name).format(number).format(matrix_name);
     }
@@ -203,7 +203,7 @@ int main() {
     matrices = new map<String, Matrix>;
     String input;
     String output;
-
+    system("color 70");
     cout << "* To see HELP enter empty command\n";
 
     while (true) {
@@ -240,12 +240,10 @@ int main() {
             else if (command == "MULTIPLY")
                 output = multiply(parts);
 
-            else if (parts[0] == "CLEAN")
-                if (parts.size() == 1)
+            else if (command == "CLEAN")
                     system("CLS");
 
-            else if (parts[0] == "EXIT")
-                if (parts.size() == 1)
+            else if (command == "EXIT")
                     break;
             else
                 output = "! Unknown command";
@@ -272,6 +270,7 @@ int main() {
         }
 
         cout << output << "\n\n";
+        output.clear();
     }
 }
 

@@ -13,12 +13,13 @@ class Matrix {
 private:
     std::pair<int, int> _size; // first – количество строк, second – количество столбцов
     std::vector<std::vector<double>> matrix;  // Матрица
-public:
-    Matrix() {};
-
-    Matrix(std::string file_path, int number = 0, std::string str = "    ");
 
     Matrix(std::vector<std::vector<double>> vector);
+    Matrix(int lines, int columns);
+public:
+    Matrix() = default;
+
+    Matrix(std::string file_path, int number = 0, std::string str = "    ");
 
     Matrix transpose(); // Возвраащет транспонированную матрицу, не меняя оригинал
 
@@ -30,7 +31,7 @@ public:
 
     friend Matrix operator*(double number, Matrix matrix);
 
-    String toRaw(std::string str = "    "); // Возвращает строку с матрицей построчно
+    String toString(std::string str = "    "); // Возвращает строку с матрицей построчно
 
     void save(std::string file_path, std::string str = "    ");
 
@@ -38,20 +39,16 @@ public:
 
     std::vector<double> &operator[](int number);
 
+private:
     void setMatrix(const std::vector<std::vector<double>> &matrix);
 
-private:
-    std::vector<std::vector<double>> get_minor(int a, int b);
+    Matrix get_minor(int a, int b);
 
-    std::vector<std::vector<double>> from_file(std::string file_path, int number, std::string str);
+    static std::vector<double> subtract_line(std::vector<double> vector_0, std::vector<double> vector_1);
 
-    std::vector<double> subtract_line(std::vector<double> vector_0, std::vector<double> vector_1);
+    static std::vector<double> sum_line(std::vector<double> vector_0, std::vector<double> vector_1);
 
-    std::vector<double> sum_line(std::vector<double> vector_0, std::vector<double> vector_1);
-
-    std::vector<double> multiply_line(std::vector<double> vector, double number);
-
-    double get_determinant(std::vector<std::vector<double>> matrix);
+    static std::vector<double> multiply_line(std::vector<double> vector, double number);
 };
 
 #endif //LB2_MATRIX_H
