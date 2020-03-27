@@ -59,6 +59,7 @@ Matrix Matrix::transpose() {
 } //
 
 double Matrix::determinant() {
+    std::vector<std::vector<double>> matrix = this->matrix;
     for (int q = 0; q < matrix.size(); q++) {
         if (matrix[q][q] == 0) {
             int not_null = q;
